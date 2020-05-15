@@ -129,7 +129,7 @@ ws.on('open', () => {
 })
 ```
 
-### ApplicationUpdate
+### Application Update
 
 #### TBD
 
@@ -175,18 +175,13 @@ Set file system to app webview
 package main
 
 import (
-	"github.com/lulucas/bui"
+    "github.com/lulucas/bui"
     "ui"
 )
 
 func main() {
     app := bui.NewApp()
-    app.SetMainView(bui.CreateView(bui.CreateViewOption{
-        Title:       "bui",
-        Width:       900,
-        Height:      600,
-        Transparent: false,
-    }))
+    app.SetMainView(bui.CreateView(bui.CreateViewOption{}))
     app.MainView().SetFileSystem(ui.FS(false))
     app.Start()
 }
@@ -197,7 +192,3 @@ func main() {
 ```
 go build -ldflags "-w -s -H=windowsgui"
 ```
-
-### Cross platform
-
-Cross build using xgo.

@@ -45,8 +45,16 @@ func main() {
 
 ### Tray
 
-```go
-
+```
+if icon, err := bui.IconFromBytes(FSMustByte(false, "/favicon.ico")); err == nil {
+    app.MainView().SetIcon(icon)
+    app.MainView().Tray().SetIcon(icon)
+    app.MainView().Tray().SetTooltip("BUI")
+    app.MainView().Tray().OnLeftMouseClick(func() {
+        app.MainView().Restore()
+        app.MainView().ShowOnTop()
+    })
+}
 ```
 
 ### RPC

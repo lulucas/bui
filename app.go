@@ -8,7 +8,7 @@ func init() {
 	Initialize("")
 }
 
-type app struct {
+type App struct {
 	mainView *WebView
 	views    []*WebView
 	closing  chan bool
@@ -20,13 +20,13 @@ type app struct {
 	onStop        func()
 }
 
-func NewApp() *app {
-	return &app{
+func NewApp() *App {
+	return &App{
 		closing: make(chan bool, 1),
 	}
 }
 
-func (a *app) messageLoop() {
+func (a *App) messageLoop() {
 	for {
 		select {
 		case f := <-wkeCall:
@@ -43,15 +43,15 @@ func (a *app) messageLoop() {
 	}
 }
 
-func (a *app) SetMainView(view *WebView) {
+func (a *App) SetMainView(view *WebView) {
 	a.mainView = view
 }
 
-func (a *app) MainView() *WebView {
+func (a *App) MainView() *WebView {
 	return a.mainView
 }
 
-func (a *app) Start() {
+func (a *App) Start() {
 	if a.onBeforeStart != nil {
 		a.onBeforeStart()
 	}
@@ -65,7 +65,7 @@ func (a *app) Start() {
 	a.messageLoop()
 }
 
-func (a *app) Close() {
+func (a *App) Close() {
 	if a.onBeforeStop != nil {
 		a.onBeforeStop()
 	}
@@ -79,18 +79,18 @@ func (a *app) Close() {
 	}
 }
 
-func (a *app) OnBeforeStart(f func()) {
+func (a *App) OnBeforeStart(f func()) {
 	a.onBeforeStart = f
 }
 
-func (a *app) OnStart(f func()) {
+func (a *App) OnStart(f func()) {
 	a.onStart = f
 }
 
-func (a *app) OnBeforeStop(f func()) {
+func (a *App) OnBeforeStop(f func()) {
 	a.onBeforeStop = f
 }
 
-func (a *app) OnStop(f func()) {
+func (a *App) OnStop(f func()) {
 	a.onStop = f
 }

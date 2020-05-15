@@ -8,7 +8,7 @@ Download miniblink release path to work directory, rename `node.dll` to `ui.dll`
 
 If your application is 64bit, rename `miniblink_x64.dll` to `ui.dll`.
 
-You can custom dll name by calling `Initialize("ui_your_name.dll")` function.
+You can also custom dll name by calling `Initialize("ui_your_name.dll")` function.
 
 ```
 https://github.com/weolar/miniblink49/releases
@@ -88,7 +88,7 @@ func main() {
         log.Printf("notify open url: %s", params.Url)
     })
     time.AfterFunc(5*time.Second, func() {
-        // broadcast a event
+        // emit a event to who subscribes this event name
         app.MainView().RPC().Emit("state_changed", struct {
             State string
             Time  time.Time

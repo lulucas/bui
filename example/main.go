@@ -2,8 +2,8 @@
 package main
 
 import (
-	"bui"
 	"fmt"
+	"github.com/lulucas/bui"
 	"log"
 	"os"
 	"time"

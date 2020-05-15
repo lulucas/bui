@@ -29,7 +29,7 @@ https://github.com/weolar/miniblink49/releases
 ```go
 package main
 
-import "bui"
+import "github.com/lulucas/bui"
 
 func main() {
     app := bui.NewApp()
@@ -63,7 +63,7 @@ BUI serves build-in rpc which is compatible with rpc-websockets.
 package main
 
 import (
-	"bui"
+	"github.com/lulucas/bui"
 	"fmt"
 	"log"
 	"time"
@@ -175,7 +175,7 @@ Set file system to app webview
 package main
 
 import (
-	"bui"
+	"github.com/lulucas/bui"
     "ui"
 )
 

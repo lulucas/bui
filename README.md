@@ -101,22 +101,6 @@ func main() {
 }
 ```
 
-#### 
-
-Miniblink function must be called at main thread,
-you can use `bui.WkeSyncCall` or `bui.WkeAsyncCall` to call function in the main thread.
-
-```
-bui.WkeAsyncCall(func() {
-    app.MainView().Hide()
-})
-```
-
-### Devtools
-
-Extract miniblink `front_end` folder to disk, 
-then `ShowDevTools(path string)` of WebView to show dev tools.
-
 #### Web side example
 
 ```javascript
@@ -136,6 +120,22 @@ ws.on('open', () => {
   })
 })
 ```
+
+#### Main Thread Call Problem For Wke
+
+Miniblink function must be called at the main thread,
+you can use `bui.WkeSyncCall` or `bui.WkeAsyncCall` to make calling in the main thread.
+
+```
+bui.WkeAsyncCall(func() {
+    app.MainView().Hide()
+})
+```
+
+### Devtools
+
+Extract miniblink `front_end` folder to disk, 
+then `ShowDevTools(path string)` of WebView to show dev tools.
 
 ### Application Update
 

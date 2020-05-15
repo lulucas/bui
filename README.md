@@ -113,9 +113,9 @@ ws.on('open', () => {
 
   ws.notify('open_url', {url: "http://www.google.com"})
 
-  ws.subscribe('stateChanged')
+  ws.subscribe('state_changed')
 
-  ws.on('stateChanged', state => {
+  ws.on('state_changed', state => {
     console.log(`stateChanged ${state}`)
   })
 })

@@ -10,6 +10,7 @@ import (
 )
 
 func main() {
+	bui.Initialize()
 	app := bui.NewApp()
 	app.SetMainView(bui.CreateView(bui.CreateViewOption{
 		Title:       "bui",

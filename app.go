@@ -4,10 +4,6 @@ import (
 	"github.com/lxn/win"
 )
 
-func init() {
-	Initialize("")
-}
-
 type App struct {
 	mainView *WebView
 	views    []*WebView

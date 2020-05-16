@@ -24,7 +24,11 @@ func WkeSyncCall(f func()) {
 	<-resolve
 }
 
-func Initialize(path string) {
+func Initialize() {
+	InitializeByDllPath("")
+}
+
+func InitializeByDllPath(path string) {
 	runtime.LockOSThread()
 	if path == "" {
 		path = FindDLL()

@@ -128,6 +128,14 @@ func (v *WebView) Hide() {
 	C.showWindow(v.window, C.bool(false))
 }
 
+func (v *WebView) Minimize() {
+	win.ShowWindow(v.handle, win.SW_MINIMIZE)
+}
+
+func (v *WebView) Maximize() {
+	win.ShowWindow(v.handle, win.SW_MAXIMIZE)
+}
+
 func (v *WebView) Restore() {
 	win.ShowWindow(v.handle, win.SW_RESTORE)
 }

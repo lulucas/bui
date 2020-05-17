@@ -36,6 +36,7 @@ func (a *App) messageLoop() {
 			return
 		case <-quit:
 			a.Close()
+			os.Exit(0)
 			return
 		default:
 			msg := &win.MSG{}

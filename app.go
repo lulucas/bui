@@ -2,6 +2,9 @@ package bui
 
 import (
 	"github.com/lxn/win"
+	"os"
+	"os/signal"
+	"syscall"
 )
 
 type App struct {
@@ -23,11 +26,16 @@ func NewApp() *App {
 }
 
 func (a *App) messageLoop() {
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, os.Interrupt, os.Kill, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM)
 	for {
 		select {
 		case f := <-wkeCall:
 			f()
 		case <-a.closing:
+			return
+		case <-quit:
+			a.Close()
 			return
 		default:
 			msg := &win.MSG{}

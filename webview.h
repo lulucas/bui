@@ -1,24 +1,25 @@
 #ifndef WEBVIEW_DEFINE_H
 #define WEBVIEW_DEFINE_H
 
-#include "wke.h"
+#include "mb.h"
+#include "util.h"
 
-void bindPort();
-wkeWebView createWebWindow(int width, int height, bool transparent);
-HWND getWindowHandle(wkeWebView window);
-void loadURL(wkeWebView window, char *url);
-void reloadURL(wkeWebView window);
-void setWindowTitle(wkeWebView window, char *title);
-void destroyWindow(wkeWebView window);
-void showWindow(wkeWebView window, bool show);
-void moveToCenter(wkeWebView window);
-void setLocalStorageFullPath(wkeWebView webView, const char* path);
-void setCookieJarFullPath(wkeWebView webView, const char* path);
-void showDevtools(wkeWebView webView, const char* path);
+void execJs(mbWebView window, const char* code);
+mbWebView createWebWindow(int width, int height, bool transparent);
+HWND getWindowHandle(mbWebView window);
+void setWindowTitle(mbWebView window, const char *title);
+void loadURL(mbWebView window, char *url);
+void reloadURL(mbWebView window);
+void destroyWindow(mbWebView window);
+void showWindow(mbWebView window, bool show);
+void moveToCenter(mbWebView window);
+void setLocalStorageFullPath(mbWebView webView, const char* path);
+void setCookieJarFullPath(mbWebView webView, const char* path);
+void showDevtools(mbWebView webView, const char* path);
 
-void onDocumentReady(wkeWebView window, void* param);
-void onWindowDestroy(wkeWebView window, void* param);
-void onLoadUrlBegin(wkeWebView window, void *param);
-void onLoadUrlEnd(wkeWebView window, void *param);
+void onDocumentReady(mbWebView window, void* param);
+void onWindowDestroy(mbWebView window, void* param);
+void onLoadUrlBegin(mbWebView window, void *param);
+void onLoadUrlEnd(mbWebView window, void *param);
 
 #endif

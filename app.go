@@ -10,8 +10,7 @@ import (
 type App struct {
 	mainView *WebView
 	views    []*WebView
-	closing  chan bool
-
+	quit     chan os.Signal
 	// Life cycle
 	onBeforeStart func()
 	onStart       func()
@@ -21,23 +20,20 @@ type App struct {
 
 func NewApp() *App {
 	return &App{
-		closing: make(chan bool, 1),
+		quit: make(chan os.Signal, 1),
 	}
 }
 
 func (a *App) messageLoop() {
-	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, os.Interrupt, os.Kill, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM)
+	signal.Notify(a.quit, os.Interrupt, os.Kill, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM)
 	for {
 		select {
-		case f := <-wkeCall:
+		case f := <-uiCall:
 			f()
-		case <-a.closing:
-			return
-		case <-quit:
+		case <-a.quit:
 			a.Close()
+			Finalize()
 			os.Exit(0)
-			return
 		default:
 			msg := &win.MSG{}
 			if win.GetMessage(msg, 0, 0, 0) != 0 {
@@ -78,7 +74,7 @@ func (a *App) Close() {
 		a.mainView.Close()
 		a.mainView = nil
 	}
-	a.closing <- true
+	a.quit <- syscall.SIGTERM
 	if a.onStop != nil {
 		a.onStop()
 	}

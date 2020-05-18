@@ -1,10 +1,27 @@
 package bui
 
-import "runtime"
+import "C"
+import (
+	"path/filepath"
+	"runtime"
+)
 
-func FindDLL() string {
+func FindNodeDLL() string {
 	if runtime.GOARCH == "amd64" {
-		return "ui_x64.dll"
+		p, _ := filepath.Abs("miniblink_x64.dll")
+		return p
+	} else {
+		p, _ := filepath.Abs("node.dll")
+		return p
 	}
-	return "ui.dll"
+}
+
+func FindMbDLL() string {
+	if runtime.GOARCH == "amd64" {
+		p, _ := filepath.Abs("mb_x64.dll")
+		return p
+	} else {
+		p, _ := filepath.Abs("mb.dll")
+		return p
+	}
 }

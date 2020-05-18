@@ -3,21 +3,22 @@ package bui
 // #include "blink.h"
 import "C"
 import (
+	"fmt"
 	"runtime"
 	"unsafe"
 )
 
 var (
-	wkeCall = make(chan func(), 1)
+	uiCall = make(chan func(), 1)
 )
 
-func WkeAsyncCall(f func()) {
-	wkeCall <- f
+func AsyncCall(f func()) {
+	uiCall <- f
 }
 
-func WkeSyncCall(f func()) {
+func SyncCall(f func()) {
 	resolve := make(chan interface{}, 1)
-	wkeCall <- func() {
+	uiCall <- func() {
 		f()
 		resolve <- true
 	}
@@ -25,17 +26,33 @@ func WkeSyncCall(f func()) {
 }
 
 func Initialize() {
-	InitializeByDllPath("")
+	InitializeByDllPath("", "")
 }
 
-func InitializeByDllPath(path string) {
+func InitializeByDllPath(nodeDll string, mbDll string) {
 	runtime.LockOSThread()
-	if path == "" {
-		path = FindDLL()
+
+	if nodeDll == "" {
+		nodeDll = FindNodeDLL()
 	}
-	cPath := C.CString(path)
-	defer C.free(unsafe.Pointer(cPath))
-	C.wkeSetWkeDllPath(cPath)
-	C.wkeInitialize()
-	C.bindPort()
+
+	cNodePath := C.CString(nodeDll)
+	C.mbSetMbMainDllPath(cNodePath)
+	C.free(unsafe.Pointer(cNodePath))
+
+	if mbDll == "" {
+		mbDll = FindMbDLL()
+	}
+	cMbPath := C.CString(mbDll)
+	C.mbSetMbDllPath(cMbPath)
+	C.free(unsafe.Pointer(cMbPath))
+
+	fmt.Println("here???")
+
+	C.mbInitialize()
+	fmt.Println("here???")
+}
+
+func Finalize() {
+	C.mbFinalize()
 }

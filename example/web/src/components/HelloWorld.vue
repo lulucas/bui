@@ -9,8 +9,8 @@
 </template>
 
 <script>
-var WebSocket = require('rpc-websockets').Client
-const port = window.BUI_PORT ? window.BUI_PORT() : 8888
+const WebSocket = require('rpc-websockets').Client
+const port = window.BUI_PORT || 8888
 const ws = new WebSocket(`ws://127.0.0.1:${port}/rpc`)
 
 export default {

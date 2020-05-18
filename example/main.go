@@ -6,14 +6,13 @@ import (
 	"github.com/lulucas/bui"
 	"log"
 	"os"
-	"time"
 )
 
 func main() {
 	bui.Initialize()
 	app := bui.NewApp()
 	app.SetMainView(bui.CreateView(bui.CreateViewOption{
-		Title:       "bui",
+		Title:       "bui测试",
 		Width:       900,
 		Height:      600,
 		Transparent: false,
@@ -36,25 +35,25 @@ func main() {
 		log.Printf("notify open url: %s", params.Url)
 	})
 	app.MainView().RPC().Register("minimize_to_tray", func() {
-		bui.WkeAsyncCall(func() {
+		bui.AsyncCall(func() {
 			app.MainView().Hide()
 		})
 	})
-	ticker := time.NewTicker(5 * time.Second)
-	go func() {
-		for range ticker.C {
-			if app.MainView() == nil {
-				break
-			}
-			app.MainView().RPC().Emit("state_changed", struct {
-				State string
-				Time  time.Time
-			}{
-				State: "start",
-				Time:  time.Now(),
-			})
-		}
-	}()
+	//ticker := time.NewTicker(5 * time.Second)
+	//go func() {
+	//	for range ticker.C {
+	//		if app.MainView() == nil {
+	//			break
+	//		}
+	//		app.MainView().RPC().Emit("state_changed", struct {
+	//			State string
+	//			Time  time.Time
+	//		}{
+	//			State: "start",
+	//			Time:  time.Now(),
+	//		})
+	//	}
+	//}()
 	app.MainView().ShowDevTools("devtools")
 	app.OnStart(func() {
 		fmt.Println("BUI started!")

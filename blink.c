@@ -1,41 +1,45 @@
 #include "blink.h"
 
-typedef void (WKE_CALL_TYPE *FN_wkeInitializeEx)(const wkeSettings* settings);
+// mb
 
-__declspec(selectany) const wchar_t* s_wkeDllPath = L"ui.dll";
-__declspec(selectany) HMODULE s_wkeMainDllHandle = NULL;
+typedef void (MB_CALL_TYPE *FN_mbInit)(const mbSettings* settings);
 
-void wkeSetWkeDllHandle(const HMODULE mainDllHandle)
+__declspec(selectany) const wchar_t* kMbDllPath = L"mb.dll";
+__declspec(selectany) const wchar_t* kMbMainDllPath = L"node.dll";
+
+void mbSetMbDllPath(const char* dllPath)
 {
-    s_wkeMainDllHandle = mainDllHandle;
+    //kMbDllPath = utf8ToUtf16(dllPath);
 }
 
-void wkeSetWkeDllPath(const char* dllPath)
+void mbSetMbMainDllPath(const char* dllPath)
 {
-    size_t cSize = strlen(dllPath) + 1;
-    wchar_t *wDllPath = (wchar_t *)malloc(sizeof(wchar_t) * cSize);
-    mbstowcs(wDllPath, dllPath, cSize);
-
-    s_wkeDllPath = wDllPath;
+    //kMbMainDllPath = utf8ToUtf16(dllPath);
 }
 
-int wkeInitializeEx(const wkeSettings* settings)
+void mbInit(const mbSettings* settings)
 {
-    HMODULE hMod = s_wkeMainDllHandle;
-    if (!hMod)
-        hMod = LoadLibraryW(s_wkeDllPath);
-    if (hMod) {
-        FN_wkeInitializeEx wkeInitializeExFunc = (FN_wkeInitializeEx)GetProcAddress(hMod, "wkeInitializeEx");
-        wkeInitializeExFunc(settings);
+//    LoadLibraryW(kMbMainDllPath);
+//    HMODULE hMod = LoadLibraryW(kMbDllPath);
+    LoadLibraryW(L"D:\\lulucas\\bui\\example\\miniblink_x641.dll");
+    HMODULE hMod = LoadLibraryW(L"D:\\lulucas\\bui\\example\\mb_x64.dll");
 
-        WKE_FOR_EACH_DEFINE_FUNCTION(WKE_GET_PTR_ITERATOR0, WKE_GET_PTR_ITERATOR1, WKE_GET_PTR_ITERATOR2, WKE_GET_PTR_ITERATOR3, \
-            WKE_GET_PTR_ITERATOR4, WKE_GET_PTR_ITERATOR5, WKE_GET_PTR_ITERATOR6, WKE_GET_PTR_ITERATOR11);
-        return 1;
-    }
-    return 0;
+    FN_mbInit mbInitExFunc = (FN_mbInit)GetProcAddress(hMod, "mbInit");
+    mbInitExFunc(settings);
+
+    MB_FOR_EACH_DEFINE_FUNCTION(MB_GET_PTR_ITERATOR0, MB_GET_PTR_ITERATOR1, MB_GET_PTR_ITERATOR2, MB_GET_PTR_ITERATOR3, \
+        MB_GET_PTR_ITERATOR4, MB_GET_PTR_ITERATOR5, MB_GET_PTR_ITERATOR6, MB_GET_PTR_ITERATOR7, MB_GET_PTR_ITERATOR8, MB_GET_PTR_ITERATOR9, MB_GET_PTR_ITERATOR10, MB_GET_PTR_ITERATOR11);
+
+    return;
 }
 
-int wkeInitialize()
+void mbInitialize()
 {
-    return wkeInitializeEx(((const wkeSettings*)0));
+    mbSettings settings;
+    memset(&settings, 0, sizeof(settings));
+    mbInit(&settings);
+}
+
+void mbFinalize() {
+    mbUninit();
 }

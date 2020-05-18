@@ -1,94 +1,79 @@
 #include "webview.h"
 
-int goGetBuiPort(wkeWebView window);
-jsValue WKE_CALL_TYPE onBuiPort(jsExecState es, void *param)
-{
-    int port = goGetBuiPort(jsGetWebView(es));
-    return jsInt(port);
-}
-void bindPort() {
-    wkeJsBindFunction("BUI_PORT", onBuiPort, NULL, 2);
+void execJs(mbWebView webView, const char* code) {
+    mbRunJs(webView, mbWebFrameGetMainFrame(webView), code, FALSE, NULL, NULL, NULL);
 }
 
-wkeWebView createWebWindow(int width, int height, bool transparent) {
-    wkeWebView window = wkeCreateWebWindow(transparent ? WKE_WINDOW_TYPE_TRANSPARENT : WKE_WINDOW_TYPE_POPUP, NULL, 0, 0, width, height);
+mbWebView createWebWindow(int width, int height, bool transparent) {
+    mbWebView window = mbCreateWebWindow(transparent ? MB_WINDOW_TYPE_TRANSPARENT : MB_WINDOW_TYPE_POPUP, NULL, 0, 0, width, height);
     return window;
 }
 
-HWND getWindowHandle(wkeWebView window)
+HWND getWindowHandle(mbWebView window)
 {
-    return wkeGetWindowHandle(window);
+    return mbGetHostHWND(window);
 }
 
-void loadURL(wkeWebView window, char *url)
+void setWindowTitle(mbWebView window, const char *title) {
+    HWND hWnd = getWindowHandle(window);
+    // SetWindowTextW(hWnd, utf8ToUtf16(title));
+    SetWindowText(hWnd, title);
+}
+
+void loadURL(mbWebView window, char *url)
 {
-    wkeLoadURL(window, url);
+    mbLoadURL(window, url);
     free(url);
 }
 
-void reloadURL(wkeWebView window)
+void reloadURL(mbWebView window)
 {
-    wkeReload(window);
+    mbReload(window);
 }
 
-void setWindowTitle(wkeWebView window, char *title)
+void destroyWindow(mbWebView window)
 {
-    wkeSetWindowTitle(window, title);
-    free(title);
+    mbDestroyWebView(window);
 }
 
-void destroyWindow(wkeWebView window)
-{
-    wkeDestroyWebWindow(window);
+void showWindow(mbWebView window, bool show) {
+    mbShowWindow(window, show);
 }
 
-void showWindow(wkeWebView window, bool show) {
-    wkeShowWindow(window, show);
+void moveToCenter(mbWebView window) {
+    mbMoveToCenter(window);
 }
 
-void moveToCenter(wkeWebView window) {
-    wkeMoveToCenter(window);
+void setLocalStorageFullPath(mbWebView webView, const char* path) {
+    //mbSetLocalStorageFullPath(webView, utf8ToUtf16(path));
 }
 
-void setLocalStorageFullPath(wkeWebView webView, const char* path) {
-    size_t cSize = strlen(path) + 1;
-    wchar_t *wPath = (wchar_t *)malloc(sizeof(wchar_t) * cSize);
-    mbstowcs(wPath, path, cSize);
-    wkeSetLocalStorageFullPath(webView, wPath);
+void setCookieJarFullPath(mbWebView webView, const char* path) {
+    //mbSetCookieJarFullPath(webView, utf8ToUtf16(path));
 }
 
-void setCookieJarFullPath(wkeWebView webView, const char* path) {
-    size_t cSize = strlen(path) + 1;
-    wchar_t *wPath = (wchar_t *)malloc(sizeof(wchar_t) * cSize);
-    mbstowcs(wPath, path, cSize);
-    wkeSetCookieJarFullPath(webView, wPath);
-}
-
-void showDevtools(wkeWebView webView, const char* path) {
-    size_t cSize = strlen(path) + 1;
-    wchar_t *wPath = (wchar_t *)malloc(sizeof(wchar_t) * cSize);
-    mbstowcs(wPath, path, cSize);
-    wkeShowDevtools(webView, wPath, NULL, NULL);
+void showDevtools(mbWebView webView, const char* path) {
+    // mbShowDevtools(webView, utf8ToUtf16(path), NULL, NULL);
 }
 
 // ----------- Callback -------------
 
-void goOnDocumentReady(wkeWebView window, void *param);
-void onDocumentReady(wkeWebView window, void* param) {
-    wkeOnDocumentReady(window, goOnDocumentReady, param);
+void goOnDocumentReady(mbWebView window, void *param, mbWebFrameHandle frameId);
+void onDocumentReady(mbWebView window, void* param) {
+    mbOnDocumentReady(window, goOnDocumentReady, param);
 }
 
-void goOnWindowDestroy(wkeWebView window, void *param);
-void onWindowDestroy(wkeWebView window, void* param) {
-    wkeOnWindowDestroy(window, goOnWindowDestroy, param);
+BOOL goOnWindowDestroy(mbWebView window, void *param, void* unused);
+void onWindowDestroy(mbWebView window, void* param) {
+    mbOnDestroy(window, goOnWindowDestroy, param);
 }
 
-bool goOnLoadUrlBegin(wkeWebView window, void *param, const utf8* url, wkeNetJob job);
-void onLoadUrlBegin(wkeWebView window, void *param) {
-    wkeOnLoadUrlBegin(window, goOnLoadUrlBegin, param);
+BOOL goOnLoadUrlBegin(mbWebView window, void *param, const char* url, void* job);
+void onLoadUrlBegin(mbWebView window, void *param) {
+    mbOnLoadUrlBegin(window, goOnLoadUrlBegin, param);
 }
 
-void goOnLoadUrlEnd(wkeWebView window, void *param, const utf8* url, wkeNetJob job, void* buf, int len);
-void onLoadUrlEnd(wkeWebView window, void *param) {
-    wkeOnLoadUrlEnd(window, goOnLoadUrlEnd, param);
+void goOnLoadUrlEnd(mbWebView window, void *param, const char* url, void* job, void* buf, int len);
+void onLoadUrlEnd(mbWebView window, void *param) {
+    mbOnLoadUrlEnd(window, goOnLoadUrlEnd, param);
 }

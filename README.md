@@ -4,11 +4,9 @@ Golang UI base on https://github.com/weolar/miniblink49, only for windows.
 
 ## Quick Start
 
-Download miniblink release path to work directory, rename `node.dll` to `ui.dll`.
+Download miniblink release, copy `ndoe.dll` and `mb.dll` to work directory.
 
-If your application is 64bit, rename `miniblink_x64.dll` to `ui.dll`.
-
-You can also custom dll name by calling `Initialize("ui_your_name.dll")` function.
+If your application is 64bit, copy `miniblink_x64.dll` and `mb_x64.dll` to work directory.
 
 ```
 https://github.com/weolar/miniblink49/releases
@@ -32,6 +30,7 @@ package main
 import "github.com/lulucas/bui"
 
 func main() {
+    bui.Initialize()
     app := bui.NewApp()
     app.SetMainView(bui.CreateView(bui.CreateViewOption{
         Title:       "bui",
@@ -78,6 +77,7 @@ import (
 )
 
 func main() {
+    bui.Initialize()
     app := bui.NewApp()
     app.SetMainView(bui.CreateView(bui.CreateViewOption{}))
     app.MainView().RPC().Register("sum", func(params []int) (int, error) {
@@ -104,8 +104,8 @@ func main() {
 #### Web side example
 
 ```javascript
-// BUI will inject this window.BUI_PORT function at runtime
-const ws = new WebSocket(`ws://127.0.0.1:${window.BUI_PORT ? window.BUI_PORT() : 8888}/rpc`)
+// BUI will inject this window.BUI_PORT variable at runtime
+const ws = new WebSocket(`ws://127.0.0.1:${window.BUI_PORT ? window.BUI_PORT : 8888}/rpc`)
 ws.on('open', () => {
   ws.call('sum', [5, 3]).then(result => {
     console.log(`sum result: ${result}`)
@@ -124,10 +124,10 @@ ws.on('open', () => {
 #### Main Thread Call Problem For Wke
 
 Miniblink function must be called at the main thread,
-you can use `bui.WkeSyncCall` or `bui.WkeAsyncCall` to make calling in the main thread.
+you can use `bui.SyncCall` or `bui.AsyncCall` to make calling in the main thread.
 
 ```
-bui.WkeAsyncCall(func() {
+bui.AsyncCall(func() {
     app.MainView().Hide()
 })
 ```

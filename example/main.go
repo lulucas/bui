@@ -12,7 +12,7 @@ func main() {
 	bui.Initialize()
 	app := bui.NewApp()
 	app.SetMainView(bui.CreateView(bui.CreateViewOption{
-		Title:       "bui测试",
+		Title:       "bui",
 		Width:       900,
 		Height:      600,
 		Transparent: false,

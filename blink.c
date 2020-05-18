@@ -9,20 +9,18 @@ __declspec(selectany) const wchar_t* kMbMainDllPath = L"node.dll";
 
 void mbSetMbDllPath(const char* dllPath)
 {
-    //kMbDllPath = utf8ToUtf16(dllPath);
+    kMbDllPath = utf8ToUtf16(dllPath);
 }
 
 void mbSetMbMainDllPath(const char* dllPath)
 {
-    //kMbMainDllPath = utf8ToUtf16(dllPath);
+    kMbMainDllPath = utf8ToUtf16(dllPath);
 }
 
 void mbInit(const mbSettings* settings)
 {
-//    LoadLibraryW(kMbMainDllPath);
-//    HMODULE hMod = LoadLibraryW(kMbDllPath);
-    LoadLibraryW(L"D:\\lulucas\\bui\\example\\miniblink_x641.dll");
-    HMODULE hMod = LoadLibraryW(L"D:\\lulucas\\bui\\example\\mb_x64.dll");
+    LoadLibraryW(kMbMainDllPath);
+    HMODULE hMod = LoadLibraryW(kMbDllPath);
 
     FN_mbInit mbInitExFunc = (FN_mbInit)GetProcAddress(hMod, "mbInit");
     mbInitExFunc(settings);

@@ -3,21 +3,19 @@
     <p>BUI port: {{port}}</p>
     <p>sum: 5+3={{ sum }}</p>
     <p>state: {{ state.State }}, updated at {{ state.Time }}</p>
-    <input type="text" name="lname" />
     <button @click="minimizeToTray">Minimize to tray</button>
   </div>
 </template>
 
 <script>
 const WebSocket = require('rpc-websockets').Client
-const port = window.BUI_PORT || 8888
-const ws = new WebSocket(`ws://127.0.0.1:${port}/rpc`)
+const ws = new WebSocket(`ws://127.0.0.1:${window.location.port}/rpc`)
 
 export default {
   name: 'HelloWorld',
   data() {
     return {
-      port: port,
+      port: window.location.port,
       sum: '?',
       state: 'idle',
     }

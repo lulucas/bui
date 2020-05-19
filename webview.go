@@ -13,7 +13,6 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"strconv"
 	"unsafe"
 )
 
@@ -72,7 +71,6 @@ func CreateView(opt CreateViewOption) *WebView {
 	v.webView = C.createWebWindow(C.int(opt.Width), C.int(opt.Height), C.bool(opt.Transparent))
 	windowViews[v.webView] = v
 	v.window = win.HWND(unsafe.Pointer(C.getWindowHandle(v.webView)))
-	v.OnReady(func() {})
 
 	v.WndProc = win.SetWindowLongPtr(v.window, win.GWLP_WNDPROC, windows.NewCallback(v.wndProc))
 	v.tray = NewTray(v.window)
@@ -227,11 +225,7 @@ func (v *WebView) wndProc(hWnd win.HWND, msg uint32, wParam, lParam uintptr) uin
 
 //export goOnDocumentReady
 func goOnDocumentReady(webView C.mbWebView, param, frameId unsafe.Pointer) {
-	if v, ok := windowViews[webView]; ok {
-		fmt.Println("window.BUI_PORT=" + strconv.Itoa(v.port) + ";")
-		C.execJs(webView, C.CString("window.BUI_PORT="+strconv.Itoa(v.port)+";"))
-	}
-	if cb := pointer.Restore(param).(*func()); cb != nil {
+	if cb := pointer.Restore(param).(*func()); cb != nil && *cb != nil {
 		(*cb)()
 	}
 }
@@ -241,7 +235,7 @@ func goOnWindowDestroy(webView C.mbWebView, param, _ unsafe.Pointer) int {
 	if _, ok := windowViews[webView]; ok {
 		delete(windowViews, webView)
 	}
-	if cb := pointer.Restore(param).(*func()); cb != nil {
+	if cb := pointer.Restore(param).(*func()); cb != nil && *cb != nil {
 		(*cb)()
 		pointer.Unref(param)
 	}
@@ -250,7 +244,7 @@ func goOnWindowDestroy(webView C.mbWebView, param, _ unsafe.Pointer) int {
 
 //export goOnLoadUrlBegin
 func goOnLoadUrlBegin(webView C.mbWebView, param unsafe.Pointer, url *C.char, job C.mbNetJob) int {
-	if cb := pointer.Restore(param).(*func(url string, job C.mbNetJob)); cb != nil {
+	if cb := pointer.Restore(param).(*func(url string, job C.mbNetJob)); cb != nil && *cb != nil {
 		(*cb)(C.GoString(url), job)
 	}
 	return 0
@@ -258,7 +252,7 @@ func goOnLoadUrlBegin(webView C.mbWebView, param unsafe.Pointer, url *C.char, jo
 
 //export goOnLoadUrlEnd
 func goOnLoadUrlEnd(webView C.mbWebView, param unsafe.Pointer, url *C.char, job C.mbNetJob, buf unsafe.Pointer, length C.int) {
-	if cb := pointer.Restore(param).(*func(url string, job C.mbNetJob, buf unsafe.Pointer, length int)); cb != nil {
+	if cb := pointer.Restore(param).(*func(url string, job C.mbNetJob, buf unsafe.Pointer, length int)); cb != nil && *cb != nil {
 		(*cb)(C.GoString(url), job, buf, int(length))
 	}
 }

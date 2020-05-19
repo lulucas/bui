@@ -6,6 +6,7 @@ import (
 	"github.com/lulucas/bui"
 	"log"
 	"os"
+	"time"
 )
 
 func main() {
@@ -39,21 +40,21 @@ func main() {
 			app.MainView().Hide()
 		})
 	})
-	//ticker := time.NewTicker(5 * time.Second)
-	//go func() {
-	//	for range ticker.C {
-	//		if app.MainView() == nil {
-	//			break
-	//		}
-	//		app.MainView().RPC().Emit("state_changed", struct {
-	//			State string
-	//			Time  time.Time
-	//		}{
-	//			State: "start",
-	//			Time:  time.Now(),
-	//		})
-	//	}
-	//}()
+	ticker := time.NewTicker(5 * time.Second)
+	go func() {
+		for range ticker.C {
+			if app.MainView() == nil {
+				break
+			}
+			app.MainView().RPC().Emit("state_changed", struct {
+				State string
+				Time  time.Time
+			}{
+				State: "start",
+				Time:  time.Now(),
+			})
+		}
+	}()
 	app.MainView().ShowDevTools("devtools")
 	app.OnStart(func() {
 		fmt.Println("BUI started!")

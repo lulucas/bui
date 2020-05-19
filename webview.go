@@ -22,8 +22,8 @@ var (
 )
 
 type WebView struct {
-	window  C.mbWebView
-	handle  win.HWND
+	webView C.mbWebView
+	window  win.HWND
 	closing bool
 	echo    *echo.Echo
 	fs      http.FileSystem
@@ -69,12 +69,13 @@ func CreateView(opt CreateViewOption) *WebView {
 		}
 	}()
 
-	v.window = C.createWebWindow(C.int(opt.Width), C.int(opt.Height), C.bool(opt.Transparent))
-	windowViews[v.window] = v
-	v.handle = win.HWND(unsafe.Pointer(C.getWindowHandle(v.window)))
+	v.webView = C.createWebWindow(C.int(opt.Width), C.int(opt.Height), C.bool(opt.Transparent))
+	windowViews[v.webView] = v
+	v.window = win.HWND(unsafe.Pointer(C.getWindowHandle(v.webView)))
+	v.OnReady(func() {})
 
-	v.WndProc = win.SetWindowLongPtr(v.handle, win.GWLP_WNDPROC, windows.NewCallback(v.wndProc))
-	v.tray = NewTray(v.handle)
+	v.WndProc = win.SetWindowLongPtr(v.window, win.GWLP_WNDPROC, windows.NewCallback(v.wndProc))
+	v.tray = NewTray(v.window)
 
 	tempPath := filepath.Join(os.TempDir(), "bui")
 	v.setLocalStorageFullPath(tempPath)
@@ -97,8 +98,8 @@ func (v *WebView) SetFileSystem(fs http.FileSystem) {
 }
 
 func (v *WebView) SetIcon(icon win.HICON) {
-	win.SendMessage(v.handle, win.WM_SETICON, 0, uintptr(icon))
-	win.SendMessage(v.handle, win.WM_SETICON, 1, uintptr(icon))
+	win.SendMessage(v.window, win.WM_SETICON, 0, uintptr(icon))
+	win.SendMessage(v.window, win.WM_SETICON, 1, uintptr(icon))
 }
 
 func (v *WebView) Tray() *Tray {
@@ -110,39 +111,39 @@ func (v *WebView) RPC() *RPC {
 }
 
 func (v *WebView) LoadUrl(url string) {
-	C.loadURL(v.window, C.CString(url))
+	C.loadURL(v.webView, C.CString(url))
 }
 
 func (v *WebView) SetTitle(title string) {
-	C.setWindowTitle(v.window, C.CString(title))
+	C.setWindowTitle(v.webView, C.CString(title))
 }
 
 func (v *WebView) MoveToCenter() {
-	C.moveToCenter(v.window)
+	C.moveToCenter(v.webView)
 }
 
 func (v *WebView) Show() {
-	C.showWindow(v.window, C.bool(true))
+	C.showWindow(v.webView, C.bool(true))
 }
 
 func (v *WebView) Hide() {
-	C.showWindow(v.window, C.bool(false))
+	C.showWindow(v.webView, C.bool(false))
 }
 
 func (v *WebView) Minimize() {
-	win.ShowWindow(v.handle, win.SW_MINIMIZE)
+	win.ShowWindow(v.window, win.SW_MINIMIZE)
 }
 
 func (v *WebView) Maximize() {
-	win.ShowWindow(v.handle, win.SW_MAXIMIZE)
+	win.ShowWindow(v.window, win.SW_MAXIMIZE)
 }
 
 func (v *WebView) Restore() {
-	win.ShowWindow(v.handle, win.SW_RESTORE)
+	win.ShowWindow(v.window, win.SW_RESTORE)
 }
 
 func (v *WebView) ToggleMaximize() {
-	if win.IsZoomed(v.handle) {
+	if win.IsZoomed(v.window) {
 		v.Restore()
 	} else {
 		v.Maximize()
@@ -150,7 +151,7 @@ func (v *WebView) ToggleMaximize() {
 }
 
 func (v *WebView) ShowOnTop() {
-	win.SetForegroundWindow(v.handle)
+	win.SetForegroundWindow(v.window)
 	v.Show()
 }
 
@@ -158,36 +159,36 @@ func (v *WebView) Close() {
 	if !v.closing {
 		v.closing = true
 		v.tray.Dispose()
-		C.destroyWindow(v.window)
+		C.destroyWindow(v.webView)
 	}
 }
 
 func (v *WebView) OnReady(callback func()) {
-	C.onDocumentReady(v.window, pointer.Save(&callback))
+	C.onDocumentReady(v.webView, pointer.Save(&callback))
 }
 
 func (v *WebView) OnDestroy(callback func()) {
-	C.onWindowDestroy(v.window, pointer.Save(&callback))
+	C.onWindowDestroy(v.webView, pointer.Save(&callback))
 }
 
 func (v *WebView) onLoadUrlBegin(callback func(url string, job C.mbNetJob)) {
-	C.onLoadUrlBegin(v.window, pointer.Save(&callback))
+	C.onLoadUrlBegin(v.webView, pointer.Save(&callback))
 }
 
 func (v *WebView) onLoadUrlEnd(callback func(url string, job C.mbNetJob, buf unsafe.Pointer, length int)) {
-	C.onLoadUrlEnd(v.window, pointer.Save(&callback))
+	C.onLoadUrlEnd(v.webView, pointer.Save(&callback))
 }
 
 func (v *WebView) setLocalStorageFullPath(path string) {
 	cPath := C.CString(path)
 	defer C.free(unsafe.Pointer(cPath))
-	C.setLocalStorageFullPath(v.window, cPath)
+	C.setLocalStorageFullPath(v.webView, cPath)
 }
 
 func (v *WebView) setCookieJarFullPath(path string) {
 	cPath := C.CString(path)
 	defer C.free(unsafe.Pointer(cPath))
-	C.setCookieJarFullPath(v.window, cPath)
+	C.setCookieJarFullPath(v.webView, cPath)
 }
 
 func (v *WebView) ShowDevTools(path string) {
@@ -198,7 +199,7 @@ func (v *WebView) ShowDevTools(path string) {
 	}
 	cPath := C.CString("file:///" + p)
 	defer C.free(unsafe.Pointer(cPath))
-	C.showDevtools(v.window, cPath)
+	C.showDevtools(v.webView, cPath)
 }
 
 func (v *WebView) wndProc(hWnd win.HWND, msg uint32, wParam, lParam uintptr) uintptr {
@@ -225,9 +226,10 @@ func (v *WebView) wndProc(hWnd win.HWND, msg uint32, wParam, lParam uintptr) uin
 */
 
 //export goOnDocumentReady
-func goOnDocumentReady(window C.mbWebView, param, frameId unsafe.Pointer) {
-	if v, ok := windowViews[window]; ok {
-		C.execJs(window, C.CString("window.BUI_PORT="+strconv.Itoa(v.port)))
+func goOnDocumentReady(webView C.mbWebView, param, frameId unsafe.Pointer) {
+	if v, ok := windowViews[webView]; ok {
+		fmt.Println("window.BUI_PORT=" + strconv.Itoa(v.port) + ";")
+		C.execJs(webView, C.CString("window.BUI_PORT="+strconv.Itoa(v.port)+";"))
 	}
 	if cb := pointer.Restore(param).(*func()); cb != nil {
 		(*cb)()
@@ -235,9 +237,9 @@ func goOnDocumentReady(window C.mbWebView, param, frameId unsafe.Pointer) {
 }
 
 //export goOnWindowDestroy
-func goOnWindowDestroy(window C.mbWebView, param, _ unsafe.Pointer) int {
-	if _, ok := windowViews[window]; ok {
-		delete(windowViews, window)
+func goOnWindowDestroy(webView C.mbWebView, param, _ unsafe.Pointer) int {
+	if _, ok := windowViews[webView]; ok {
+		delete(windowViews, webView)
 	}
 	if cb := pointer.Restore(param).(*func()); cb != nil {
 		(*cb)()
@@ -247,7 +249,7 @@ func goOnWindowDestroy(window C.mbWebView, param, _ unsafe.Pointer) int {
 }
 
 //export goOnLoadUrlBegin
-func goOnLoadUrlBegin(window C.mbWebView, param unsafe.Pointer, url *C.char, job C.mbNetJob) int {
+func goOnLoadUrlBegin(webView C.mbWebView, param unsafe.Pointer, url *C.char, job C.mbNetJob) int {
 	if cb := pointer.Restore(param).(*func(url string, job C.mbNetJob)); cb != nil {
 		(*cb)(C.GoString(url), job)
 	}
@@ -255,7 +257,7 @@ func goOnLoadUrlBegin(window C.mbWebView, param unsafe.Pointer, url *C.char, job
 }
 
 //export goOnLoadUrlEnd
-func goOnLoadUrlEnd(window C.mbWebView, param unsafe.Pointer, url *C.char, job C.mbNetJob, buf unsafe.Pointer, length C.int) {
+func goOnLoadUrlEnd(webView C.mbWebView, param unsafe.Pointer, url *C.char, job C.mbNetJob, buf unsafe.Pointer, length C.int) {
 	if cb := pointer.Restore(param).(*func(url string, job C.mbNetJob, buf unsafe.Pointer, length int)); cb != nil {
 		(*cb)(C.GoString(url), job, buf, int(length))
 	}

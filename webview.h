@@ -4,22 +4,22 @@
 #include "mb.h"
 #include "util.h"
 
-void execJs(mbWebView window, const char* code);
+void execJs(mbWebView webView, const char* code);
 mbWebView createWebWindow(int width, int height, bool transparent);
-HWND getWindowHandle(mbWebView window);
-void setWindowTitle(mbWebView window, const char *title);
-void loadURL(mbWebView window, char *url);
-void reloadURL(mbWebView window);
-void destroyWindow(mbWebView window);
-void showWindow(mbWebView window, bool show);
-void moveToCenter(mbWebView window);
+HWND getWindowHandle(mbWebView webView);
+void setWindowTitle(mbWebView webView, const char *title);
+void loadURL(mbWebView webView, char *url);
+void reloadURL(mbWebView webView);
+void destroyWindow(mbWebView webView);
+void showWindow(mbWebView webView, bool show);
+void moveToCenter(mbWebView webView);
 void setLocalStorageFullPath(mbWebView webView, const char* path);
 void setCookieJarFullPath(mbWebView webView, const char* path);
 void showDevtools(mbWebView webView, const char* path);
 
-void onDocumentReady(mbWebView window, void* param);
-void onWindowDestroy(mbWebView window, void* param);
-void onLoadUrlBegin(mbWebView window, void *param);
-void onLoadUrlEnd(mbWebView window, void *param);
+void onDocumentReady(mbWebView webView, void* param);
+void onWindowDestroy(mbWebView webView, void* param);
+void onLoadUrlBegin(mbWebView webView, void *param);
+void onLoadUrlEnd(mbWebView webView, void *param);
 
 #endif

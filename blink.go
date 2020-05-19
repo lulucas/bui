@@ -3,7 +3,6 @@ package bui
 // #include "blink.h"
 import "C"
 import (
-	"fmt"
 	"runtime"
 	"unsafe"
 )
@@ -47,10 +46,7 @@ func InitializeByDllPath(nodeDll string, mbDll string) {
 	C.mbSetMbDllPath(cMbPath)
 	C.free(unsafe.Pointer(cMbPath))
 
-	fmt.Println("here???")
-
 	C.mbInitialize()
-	fmt.Println("here???")
 }
 
 func Finalize() {

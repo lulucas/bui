@@ -5,42 +5,42 @@ void execJs(mbWebView webView, const char* code) {
 }
 
 mbWebView createWebWindow(int width, int height, bool transparent) {
-    mbWebView window = mbCreateWebWindow(transparent ? MB_WINDOW_TYPE_TRANSPARENT : MB_WINDOW_TYPE_POPUP, NULL, 0, 0, width, height);
-    return window;
+    mbWebView webView = mbCreateWebWindow(transparent ? MB_WINDOW_TYPE_TRANSPARENT : MB_WINDOW_TYPE_POPUP, NULL, 0, 0, width, height);
+    return webView;
 }
 
-HWND getWindowHandle(mbWebView window)
+HWND getWindowHandle(mbWebView webView)
 {
-    return mbGetHostHWND(window);
+    return mbGetHostHWND(webView);
 }
 
-void setWindowTitle(mbWebView window, const char *title) {
-    HWND hWnd = getWindowHandle(window);
+void setWindowTitle(mbWebView webView, const char *title) {
+    HWND hWnd = getWindowHandle(webView);
     SetWindowTextW(hWnd, utf8ToUtf16(title));
 }
 
-void loadURL(mbWebView window, char *url)
+void loadURL(mbWebView webView, char *url)
 {
-    mbLoadURL(window, url);
+    mbLoadURL(webView, url);
     free(url);
 }
 
-void reloadURL(mbWebView window)
+void reloadURL(mbWebView webView)
 {
-    mbReload(window);
+    mbReload(webView);
 }
 
-void destroyWindow(mbWebView window)
+void destroyWindow(mbWebView webView)
 {
-    mbDestroyWebView(window);
+    mbDestroyWebView(webView);
 }
 
-void showWindow(mbWebView window, bool show) {
-    mbShowWindow(window, show);
+void showWindow(mbWebView webView, bool show) {
+    mbShowWindow(webView, show);
 }
 
-void moveToCenter(mbWebView window) {
-    mbMoveToCenter(window);
+void moveToCenter(mbWebView webView) {
+    mbMoveToCenter(webView);
 }
 
 void setLocalStorageFullPath(mbWebView webView, const char* path) {
@@ -52,27 +52,27 @@ void setCookieJarFullPath(mbWebView webView, const char* path) {
 }
 
 void showDevtools(mbWebView webView, const char* path) {
-    // mbShowDevtools(webView, utf8ToUtf16(path), NULL, NULL);
+    mbSetDebugConfig(webView, "showDevTools", path);
 }
 
 // ----------- Callback -------------
 
-void goOnDocumentReady(mbWebView window, void *param, mbWebFrameHandle frameId);
-void onDocumentReady(mbWebView window, void* param) {
-    mbOnDocumentReady(window, goOnDocumentReady, param);
+void goOnDocumentReady(mbWebView webView, void *param, mbWebFrameHandle frameId);
+void onDocumentReady(mbWebView webView, void* param) {
+    mbOnDocumentReady(webView, goOnDocumentReady, param);
 }
 
-BOOL goOnWindowDestroy(mbWebView window, void *param, void* unused);
-void onWindowDestroy(mbWebView window, void* param) {
-    mbOnDestroy(window, goOnWindowDestroy, param);
+BOOL goOnWindowDestroy(mbWebView webView, void *param, void* unused);
+void onWindowDestroy(mbWebView webView, void* param) {
+    mbOnDestroy(webView, goOnWindowDestroy, param);
 }
 
-BOOL goOnLoadUrlBegin(mbWebView window, void *param, const char* url, void* job);
-void onLoadUrlBegin(mbWebView window, void *param) {
-    mbOnLoadUrlBegin(window, goOnLoadUrlBegin, param);
+BOOL goOnLoadUrlBegin(mbWebView webView, void *param, const char* url, void* job);
+void onLoadUrlBegin(mbWebView webView, void *param) {
+    mbOnLoadUrlBegin(webView, goOnLoadUrlBegin, param);
 }
 
-void goOnLoadUrlEnd(mbWebView window, void *param, const char* url, void* job, void* buf, int len);
-void onLoadUrlEnd(mbWebView window, void *param) {
-    mbOnLoadUrlEnd(window, goOnLoadUrlEnd, param);
+void goOnLoadUrlEnd(mbWebView webView, void *param, const char* url, void* job, void* buf, int len);
+void onLoadUrlEnd(mbWebView webView, void *param) {
+    mbOnLoadUrlEnd(webView, goOnLoadUrlEnd, param);
 }

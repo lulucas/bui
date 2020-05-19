@@ -104,14 +104,14 @@ func main() {
 #### Web side example
 
 ```javascript
-// BUI will inject this window.BUI_PORT variable at runtime
-const ws = new WebSocket(`ws://127.0.0.1:${window.BUI_PORT ? window.BUI_PORT : 8888}/rpc`)
+const WebSocket = require('rpc-websockets').Client
+const ws = new WebSocket(`ws://127.0.0.1:${window.location.port}/rpc`)
 ws.on('open', () => {
   ws.call('sum', [5, 3]).then(result => {
     console.log(`sum result: ${result}`)
   })
 
-  ws.notify('open_url', {url: "http://www.google.com"})
+  ws.notify('open_url', {url: "https://www.google.com"})
 
   ws.subscribe('state_changed')
 

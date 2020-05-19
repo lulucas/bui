@@ -99,7 +99,7 @@ func (rpc *RPC) response(conn *websocket.Conn, id jsonrpc2.ID, result *json.RawM
 		Result: result,
 	}
 	if err := conn.WriteJSON(res); err != nil {
-		log.Errorln(err)
+		log.Errorf("websocket write json error: %s", err.Error())
 		return
 	}
 }
@@ -113,7 +113,7 @@ func (rpc *RPC) error(conn *websocket.Conn, id jsonrpc2.ID, code int64, err erro
 		},
 	}
 	if err := conn.WriteJSON(res); err != nil {
-		log.Errorln(err)
+		log.Errorf("websocket write json error: %s", err.Error())
 		return
 	}
 }
@@ -144,12 +144,13 @@ func (rpc *RPC) dispatch(conn *websocket.Conn, req *jsonrpc2.Request) {
 func (rpc *RPC) wsHandler(w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		log.Errorln(err)
+		log.Errorf("websocket conn error: %s", err.Error())
 		return
 	}
 	for {
 		var req jsonrpc2.Request
 		if err := conn.ReadJSON(&req); err != nil {
+			rpc.clearConn(conn)
 			break
 		}
 		rpc.dispatch(conn, &req)
@@ -159,6 +160,18 @@ func (rpc *RPC) wsHandler(w http.ResponseWriter, r *http.Request) {
 func (rpc *RPC) websocket(c echo.Context) error {
 	rpc.wsHandler(c.Response(), c.Request())
 	return nil
+}
+
+func (rpc *RPC) clearConn(conn *websocket.Conn) {
+	rpc.eventMtx.Lock()
+	for _, connections := range rpc.event {
+		for c, _ := range connections {
+			if c == conn {
+				delete(connections, c)
+			}
+		}
+	}
+	rpc.eventMtx.Unlock()
 }
 
 type Handler interface {

@@ -3,6 +3,7 @@
     <p>BUI port: {{port}}</p>
     <p>sum: 5+3={{ sum }}</p>
     <p>state: {{ state.State }}, updated at {{ state.Time }}</p>
+    <button @click="sendNotify">Send Notify</button>
     <button @click="minimizeToTray">Minimize to tray</button>
   </div>
 </template>
@@ -26,8 +27,6 @@ export default {
         this.sum = result
       })
 
-      ws.notify('open_url', {url: "https://www.google.com"})
-
       ws.subscribe('state_changed')
 
       ws.on('state_changed', state => {
@@ -44,6 +43,9 @@ export default {
     })
   },
   methods: {
+    sendNotify() {
+      ws.notify('open_url', {url: "https://www.google.com"})
+    },
     minimizeToTray() {
       ws.notify('minimize_to_tray')
     }

@@ -25,3 +25,5 @@ func FindMbDLL() string {
 		return p
 	}
 }
+
+type Map map[string]interface{}

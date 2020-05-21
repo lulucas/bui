@@ -75,7 +75,7 @@ func CreateView(opt CreateViewOption) *WebView {
 	v.WndProc = win.SetWindowLongPtr(v.window, win.GWLP_WNDPROC, windows.NewCallback(v.wndProc))
 	v.tray = NewTray(v.window)
 
-	tempPath := filepath.Join(os.TempDir(), "bui")
+	tempPath := filepath.Join(os.TempDir(), TempDir)
 	v.setLocalStorageFullPath(tempPath)
 	v.setCookieJarFullPath(filepath.Join(tempPath, "data.dat"))
 

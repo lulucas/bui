@@ -13,7 +13,7 @@ import (
 func IconFromBytes(iconBytes []byte) (win.HICON, error) {
 	md5Result := md5.Sum(iconBytes)
 	filename := fmt.Sprintf("%x.ico", md5Result)
-	iconPath := filepath.Join(os.TempDir(), "bui", filename)
+	iconPath := filepath.Join(os.TempDir(), TempDir, filename)
 	err := ioutil.WriteFile(iconPath, iconBytes, 0644)
 	if err != nil {
 		return win.HICON(0), err

@@ -3,8 +3,14 @@ package bui
 // #include "blink.h"
 import "C"
 import (
+	"os"
+	"path/filepath"
 	"runtime"
 	"unsafe"
+)
+
+const (
+	TempDir = "bui"
 )
 
 var (
@@ -29,6 +35,8 @@ func Initialize() {
 }
 
 func InitializeByDllPath(nodeDll string, mbDll string) {
+	_ = os.MkdirAll(filepath.Join(os.TempDir(), TempDir), 0644)
+
 	runtime.LockOSThread()
 
 	if nodeDll == "" {

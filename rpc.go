@@ -22,6 +22,7 @@ type RPC struct {
 	methods   map[string]Handler
 	eventMtx  sync.RWMutex
 	event     map[string]map[*websocket.Conn]bool
+	connMtx   sync.Mutex
 }
 
 func NewRPC() *RPC {
@@ -85,12 +86,14 @@ func (rpc *RPC) Emit(event string, params interface{}) {
 	}
 	notification.Params = paramsBytes
 
+	rpc.connMtx.Lock()
 	for conn, _ := range connMap {
 		err = conn.WriteJSON(notification)
 		if err != nil {
 			log.Errorf("emit %s event to %s error: %s", event, conn.RemoteAddr().String(), err.Error())
 		}
 	}
+	rpc.connMtx.Unlock()
 }
 
 func (rpc *RPC) response(conn *websocket.Conn, id jsonrpc2.ID, result *json.RawMessage) {

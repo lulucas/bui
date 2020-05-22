@@ -21,15 +21,17 @@ var (
 )
 
 type WebView struct {
-	webView C.mbWebView
-	window  win.HWND
-	closing bool
-	echo    *echo.Echo
-	fs      http.FileSystem
-	rpc     *RPC
-	port    int
-	tray    *Tray
-	WndProc uintptr
+	webView    C.mbWebView
+	window     win.HWND
+	closing    bool
+	echo       *echo.Echo
+	fs         http.FileSystem
+	rpc        *RPC
+	port       int
+	tray       *Tray
+	wndProcPtr uintptr
+	modal      *WebView
+	isModal    bool
 }
 
 type CreateViewOption struct {
@@ -39,6 +41,7 @@ type CreateViewOption struct {
 	Transparent bool
 	Fs          http.FileSystem
 	Port        int
+	IsModal     bool
 }
 
 func CreateView(opt CreateViewOption) *WebView {
@@ -72,8 +75,7 @@ func CreateView(opt CreateViewOption) *WebView {
 	windowViews[v.webView] = v
 	v.window = win.HWND(unsafe.Pointer(C.getWindowHandle(v.webView)))
 
-	v.WndProc = win.SetWindowLongPtr(v.window, win.GWLP_WNDPROC, windows.NewCallback(v.wndProc))
-	v.tray = NewTray(v.window)
+	v.wndProcPtr = win.SetWindowLongPtr(v.window, win.GWLP_WNDPROC, windows.NewCallback(v.wndProc))
 
 	tempPath := filepath.Join(os.TempDir(), TempDir)
 	v.setLocalStorageFullPath(tempPath)
@@ -101,6 +103,9 @@ func (v *WebView) SetIcon(icon win.HICON) {
 }
 
 func (v *WebView) Tray() *Tray {
+	if v.tray == nil {
+		v.tray = NewTray(v.window)
+	}
 	return v.tray
 }
 
@@ -156,8 +161,41 @@ func (v *WebView) ShowOnTop() {
 func (v *WebView) Close() {
 	if !v.closing {
 		v.closing = true
-		v.tray.Dispose()
+		if v.tray != nil {
+			v.tray.Dispose()
+		}
 		C.destroyWindow(v.webView)
+		win.DestroyWindow(v.window)
+	}
+}
+
+func (v *WebView) Enable() {
+	win.EnableWindow(v.window, true)
+}
+
+func (v *WebView) Disable() {
+	win.EnableWindow(v.window, false)
+}
+
+func (v *WebView) ShowModal(width, height int, url string) {
+	modal := CreateView(CreateViewOption{
+		Width:       width,
+		Height:      height,
+		Transparent: true,
+	})
+	win.EnableWindow(v.window, false)
+	modal.LoadUrl(url)
+	modal.Show()
+	modal.OnDestroy(func() {
+		win.EnableWindow(v.window, true)
+	})
+	v.modal = modal
+}
+
+func (v *WebView) CloseModal() {
+	if v.modal != nil {
+		v.modal.Close()
+		v.modal = nil
 	}
 }
 
@@ -214,7 +252,7 @@ func (v *WebView) wndProc(hWnd win.HWND, msg uint32, wParam, lParam uintptr) uin
 			}
 		}
 	default:
-		return win.CallWindowProc(v.WndProc, hWnd, msg, wParam, lParam)
+		return win.CallWindowProc(v.wndProcPtr, hWnd, msg, wParam, lParam)
 	}
 	return 0
 }

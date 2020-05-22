@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/lulucas/bui"
 	"log"
-	"os"
 	"time"
 )
 
@@ -40,6 +39,20 @@ func main() {
 			app.MainView().Hide()
 		})
 	})
+	app.MainView().RPC().Register("show_modal", func(params struct {
+		Width  int
+		Height int
+		Url    string
+	}) {
+		bui.AsyncCall(func() {
+			app.MainView().ShowModal(params.Width, params.Height, params.Url)
+		})
+	})
+	app.MainView().RPC().Register("close_modal", func() {
+		bui.AsyncCall(func() {
+			app.MainView().CloseModal()
+		})
+	})
 	ticker := time.NewTicker(5 * time.Second)
 	go func() {
 		for range ticker.C {
@@ -61,7 +74,7 @@ func main() {
 	})
 	app.OnStop(func() {
 		// Clear
-		os.Exit(0)
+		fmt.Println("clear")
 	})
 	app.Start()
 }

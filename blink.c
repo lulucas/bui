@@ -9,12 +9,12 @@ __declspec(selectany) const wchar_t* kMbMainDllPath = L"node.dll";
 
 void mbSetMbDllPath(const char* dllPath)
 {
-    kMbDllPath = utf8ToUtf16(dllPath);
+    kMbDllPath = utf8ToWchar(dllPath);
 }
 
 void mbSetMbMainDllPath(const char* dllPath)
 {
-    kMbMainDllPath = utf8ToUtf16(dllPath);
+    kMbMainDllPath = utf8ToWchar(dllPath);
 }
 
 void mbInit(const mbSettings* settings)

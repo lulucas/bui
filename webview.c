@@ -16,7 +16,7 @@ HWND getWindowHandle(mbWebView webView)
 
 void setWindowTitle(mbWebView webView, const char *title) {
     HWND hWnd = getWindowHandle(webView);
-    SetWindowTextW(hWnd, utf8ToUtf16(title));
+    SetWindowTextW(hWnd, utf8ToWchar(title));
 }
 
 void loadURL(mbWebView webView, char *url)
@@ -44,11 +44,11 @@ void moveToCenter(mbWebView webView) {
 }
 
 void setLocalStorageFullPath(mbWebView webView, const char* path) {
-    mbSetLocalStorageFullPath(webView, utf8ToUtf16(path));
+    mbSetLocalStorageFullPath(webView, utf8ToWchar(path));
 }
 
 void setCookieJarFullPath(mbWebView webView, const char* path) {
-    mbSetCookieJarFullPath(webView, utf8ToUtf16(path));
+    mbSetCookieJarFullPath(webView, utf8ToWchar(path));
 }
 
 void showDevtools(mbWebView webView, const char* path) {

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/lulucas/bui"
 	"log"
+	"os"
 	"time"
 )
 
@@ -75,6 +76,7 @@ func main() {
 	app.OnStop(func() {
 		// Clear
 		fmt.Println("clear")
+		os.Exit(0)
 	})
 	app.Start()
 }

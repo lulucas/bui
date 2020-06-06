@@ -3,6 +3,6 @@
 
 #include <windows.h>
 
-const wchar_t* utf8ToUtf16(const char* utf8Str);
+const wchar_t* utf8ToWchar(const char* utf8Str);
 
 #endif

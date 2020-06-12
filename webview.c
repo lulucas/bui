@@ -57,22 +57,22 @@ void showDevtools(mbWebView webView, const char* path) {
 
 // ----------- Callback -------------
 
-void goOnDocumentReady(mbWebView webView, void *param, mbWebFrameHandle frameId);
+mbDocumentReadyCallback goOnDocumentReady;
 void onDocumentReady(mbWebView webView, void* param) {
     mbOnDocumentReady(webView, goOnDocumentReady, param);
 }
 
-BOOL goOnWindowDestroy(mbWebView webView, void *param, void* unused);
+mbDestroyCallback goOnWindowDestroy;
 void onWindowDestroy(mbWebView webView, void* param) {
     mbOnDestroy(webView, goOnWindowDestroy, param);
 }
 
-BOOL goOnLoadUrlBegin(mbWebView webView, void *param, const char* url, void* job);
+mbLoadUrlBeginCallback goOnLoadUrlBegin;
 void onLoadUrlBegin(mbWebView webView, void *param) {
     mbOnLoadUrlBegin(webView, goOnLoadUrlBegin, param);
 }
 
-void goOnLoadUrlEnd(mbWebView webView, void *param, const char* url, void* job, void* buf, int len);
+mbLoadUrlEndCallback goOnLoadUrlEnd;
 void onLoadUrlEnd(mbWebView webView, void *param) {
     mbOnLoadUrlEnd(webView, goOnLoadUrlEnd, param);
 }
